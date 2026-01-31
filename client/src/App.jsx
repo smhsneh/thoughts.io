@@ -3,8 +3,10 @@ import Feed from "./pages/feed/Feed";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import Login from "./pages/auth/Login";
 import Signup from "./pages/auth/Signup";
-
 import MainLayout from "./components/common/MainLayout";
+import PostDetail from "./pages/post/PostDetail";
+
+<Route path="/post/:id" element={<PostDetail />} />
 
 export default function App() {
   return (
