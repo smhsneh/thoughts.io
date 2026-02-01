@@ -6,15 +6,15 @@ import Signup from "./pages/auth/Signup";
 import MainLayout from "./components/common/MainLayout";
 import PostDetail from "./pages/post/PostDetail";
 
-<Route path="/post/:id" element={<PostDetail />} />
-
 export default function App() {
   return (
     <Routes>
       <Route element={<MainLayout />}>
         <Route path="/" element={<Feed />} />
+        <Route path="/post/:id" element={<PostDetail />} />
         <Route path="/admin" element={<AdminDashboard />} />
       </Route>
+
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
     </Routes>
