@@ -1,10 +1,10 @@
 import { Routes, Route } from "react-router-dom";
+import MainLayout from "./components/common/MainLayout";
 import Feed from "./pages/feed/Feed";
 import AdminDashboard from "./pages/admin/AdminDashboard";
+import PostDetail from "./pages/post/PostDetail";
 import Login from "./pages/auth/Login";
 import Signup from "./pages/auth/Signup";
-import MainLayout from "./components/common/MainLayout";
-import PostDetail from "./pages/post/PostDetail";
 
 export default function App() {
   return (

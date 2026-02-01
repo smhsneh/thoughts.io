@@ -1,17 +1,19 @@
 import userAvatar from "../../assets/user.jpg";
+import { NavLink } from "react-router-dom";
+
 export default function Sidebar() {
   return (
     <aside
-  className="
-    h-full
-    bg-white
-    rounded-2xl
-    border border-soft/20
-    p-6
-    flex flex-col
-    justify-between
-  "
->
+      className="
+        h-full
+        bg-white
+        rounded-2xl
+        border border-soft/20
+        p-6
+        flex flex-col
+        justify-between
+      "
+    >
       <div className="space-y-4">
         <div>
           <h1 className="font-header text-4xl font-bold text-primary">
@@ -35,13 +37,40 @@ export default function Sidebar() {
         </div>
 
         <nav className="flex flex-col gap-3 text-sm pt-2">
-          <span className="font-semibold">home</span>
-          <span className="text-gray-500">profile</span>
-          <span className="text-gray-500">admin</span>
+          <NavLink
+            to="/"
+            className={({ isActive }) =>
+              isActive
+                ? "font-semibold text-primary"
+                : "text-gray-500 hover:text-primary"
+            }
+          >
+            home
+          </NavLink>
+
+          <NavLink
+            to="/profile"
+            className="text-gray-500 hover:text-primary"
+          >
+            profile
+          </NavLink>
+
+          <NavLink
+            to="/admin"
+            className={({ isActive }) =>
+              isActive
+                ? "font-semibold text-primary"
+                : "text-gray-500 hover:text-primary"
+            }
+          >
+            admin
+          </NavLink>
         </nav>
       </div>
 
-      <div className="text-xs text-gray-400">thoughts</div>
+      <div className="text-xs text-gray-400">
+        thoughts.io
+      </div>
     </aside>
   );
 }

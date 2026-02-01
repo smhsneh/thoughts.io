@@ -1,7 +1,7 @@
 import { Outlet } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import RightPanel from "./RightPanel";
-<Outlet />
+
 export default function MainLayout() {
   return (
     <div className="min-h-screen bg-gradient-to-l from-white via-soft/100">
@@ -15,6 +15,7 @@ export default function MainLayout() {
           <div className="md:col-span-6">
             <Outlet />
           </div>
+
           <div className="hidden md:block md:col-span-3">
             <RightPanel />
           </div>
