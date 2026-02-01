@@ -4,9 +4,6 @@ import { useNavigate } from "react-router-dom";
 
 export default function PostCard({ post, onDelete }) {
   const [liked, setLiked] = useState(false);
-  const [showReply, setShowReply] = useState(false);
-  const [replyText, setReplyText] = useState("");
-
   const navigate = useNavigate();
 
   return (
@@ -58,7 +55,7 @@ export default function PostCard({ post, onDelete }) {
         </button>
 
         <button
-          onClick={() => setShowReply(!showReply)}
+          onClick={() => navigate(`/post/${post.id}`)}
           className="flex items-center gap-1"
         >
           <Reply size={14} />
@@ -71,46 +68,11 @@ export default function PostCard({ post, onDelete }) {
         >
           See more
         </button>
-      </div>
 
-      {showReply && (
-        <div className="mt-4 pl-14">
-          <textarea
-            value={replyText}
-            onChange={(e) => setReplyText(e.target.value)}
-            placeholder="Write a reply..."
-            rows={2}
-            className="
-              w-full
-              text-sm
-              border
-              border-primary/20
-              rounded-lg
-              p-2
-              outline-none
-            "
-          />
-          <div className="flex justify-end mt-2">
-            <button
-              onClick={() => {
-                setReplyText("");
-                setShowReply(false);
-              }}
-              className="
-                bg-accent
-                text-white
-                px-4 py-1
-                rounded-full
-                text-xs
-                font-semibold
-                hover:opacity-90
-              "
-            >
-              Reply
-            </button>
-          </div>
-        </div>
-      )}
+        <span className="text-gray-500">
+          {post.replyCount || 0} comments
+        </span>
+      </div>
     </div>
   );
 }

@@ -4,25 +4,28 @@ import PostCard from "../../components/post/PostCard";
 
 export default function Feed() {
   const [posts, setPosts] = useState([
-    {
-      id: 1,
-      author: "alice",
-      content: "I think social platforms should focus more on safety.",
-      time: "2h",
-    },
-    {
-      id: 2,
-      author: "bob",
-      content: "This project is about ethical moderation, not engagement.",
-      time: "4h",
-    },
-    {
-      id: 3,
-      author: "charlie",
-      content: "Text-only platforms feel calmer to read.",
-      time: "1d",
-    },
-  ]);
+  {
+    id: 1,
+    author: "alice",
+    content: "I think social platforms should focus more on safety.",
+    time: "2h",
+    replyCount: 2,
+  },
+  {
+    id: 2,
+    author: "bob",
+    content: "This project is about ethical moderation, not engagement.",
+    time: "4h",
+    replyCount: 0,
+  },
+  {
+    id: 3,
+    author: "charlie",
+    content: "Text-only platforms feel calmer to read.",
+    time: "1d",
+    replyCount: 1,
+  },
+]);
 
   const handleCreatePost = (content) => {
     const newPost = {

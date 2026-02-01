@@ -17,17 +17,25 @@ export default function PostDetail() {
 
   // Mock replies (will be extracted to ReplyCard next)
   const [replies, setReplies] = useState([
-    {
-      id: 1,
-      author: "bob",
-      content: "I agree. Moderation matters more than engagement.",
-    },
-    {
-      id: 2,
-      author: "charlie",
-      content: "But freedom of speech is also important.",
-    },
-  ]);
+  {
+    id: 1,
+    author: "bob",
+    content: "I agree. Moderation matters more than engagement.",
+    status: "normal",
+  },
+  {
+    id: 2,
+    author: "charlie",
+    content: "You're stupid if you think that.",
+    status: "flagged",
+  },
+  {
+    id: 3,
+    author: "eve",
+    content: "Go kill yourself.",
+    status: "hidden",
+  },
+]);
 
   const [replyText, setReplyText] = useState("");
 

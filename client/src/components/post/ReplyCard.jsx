@@ -1,17 +1,55 @@
 import { useState } from "react";
-import { Heart, Reply } from "lucide-react";
+import { Heart, Reply, AlertTriangle, EyeOff } from "lucide-react";
 
 export default function ReplyCard({ reply }) {
   const [liked, setLiked] = useState(false);
   const [showReply, setShowReply] = useState(false);
   const [text, setText] = useState("");
+  const [showHidden, setShowHidden] = useState(false);
+
+  if (reply.status === "hidden") {
+    return (
+      <div className="bg-red-50 border border-red-300 rounded-xl p-4 ml-6">
+        <div className="flex items-center gap-2 text-red-600 text-sm">
+          <EyeOff size={14} />
+          <span>This reply has been hidden due to policy violations.</span>
+        </div>
+
+        <button
+          onClick={() => setShowHidden(!showHidden)}
+          className="mt-2 text-xs text-red-500 hover:underline"
+        >
+          {showHidden ? "Hide content" : "See more"}
+        </button>
+
+        {showHidden && (
+          <p className="mt-2 text-sm text-red-700">
+            {reply.content}
+          </p>
+        )}
+      </div>
+    );
+  }
 
   return (
-    <div className="bg-white rounded-xl border border-primary/30 p-4 ml-6">
+    <div
+      className={`rounded-xl p-4 ml-6 border ${
+        reply.status === "flagged"
+          ? "border-red-400 bg-red-50"
+          : "border-primary/30 bg-white"
+      }`}
+    >
       <div className="flex items-center gap-2 text-sm">
         <span className="font-header text-primary">
           @{reply.author}
         </span>
+
+        {reply.status === "flagged" && (
+          <span className="flex items-center gap-1 text-red-600 text-xs">
+            <AlertTriangle size={12} />
+            Flagged
+          </span>
+        )}
       </div>
 
       <p className="text-sm mt-1 text-black">
