@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const replySchema = new mongoose.Schema(
   {
@@ -21,7 +21,6 @@ const replySchema = new mongoose.Schema(
       maxlength: 300,
     },
 
-    // ML-related fields
     category: {
       type: String,
       default: "normal",
@@ -38,9 +37,8 @@ const replySchema = new mongoose.Schema(
       default: "normal",
     },
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
-module.exports = mongoose.model("Reply", replySchema);
+const Reply = mongoose.model("Reply", replySchema);
+export default Reply;
