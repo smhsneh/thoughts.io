@@ -32,11 +32,12 @@ for harmful or abusive content.
 ### backend
 
 1. navigate to server folder
-2. install dependencies ( local mongodb connection for now )
+2. install dependencies ( local mongodb connection for now , in .env)
 3. start the backend server
    ```bash
    cd server
    npm install
    npm run dev
+   
    port=5000
    mongo_uri=your_mongodb_connection_string
