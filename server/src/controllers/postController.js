@@ -5,35 +5,34 @@ export const createPost = async (req, res) => {
   try {
     const { content, userId } = req.body;
 
-    if (!content || !userId) {
-      return res.status(400).json({ message: "Missing fields" });
-    }
-
-    const user = await User.findById(userId);
-
-    if (!user || user.isBlocked) {
-      return res.status(403).json({ message: "User not allowed" });
-    }
-
     const post = await Post.create({
-      author: userId,
       content,
+      author: userId,
     });
 
-    res.status(201).json(post);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+    const populatedPost = await post.populate("author", "username");
+
+    res.status(201).json(populatedPost);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to create post" });
   }
 };
 
-export const getAllPosts = async (req, res) => {
-  try {
-    const posts = await Post.find({ isHidden: false })
-      .populate("author", "username")
-      .sort({ createdAt: -1 });
+export const getPosts = async (req, res) => {
+  const posts = await Post.find()
+    .populate("author", "username")
+    .sort({ createdAt: -1 });
 
-    res.status(200).json(posts);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+  res.json(posts);
+};
+
+export const getPostById = async (req, res) => {
+  const post = await Post.findById(req.params.id)
+    .populate("author", "username");
+
+  if (!post) {
+    return res.status(404).json({ message: "Post not found" });
   }
+
+  res.json(post);
 };

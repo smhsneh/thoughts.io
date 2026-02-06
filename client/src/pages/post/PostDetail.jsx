@@ -1,5 +1,5 @@
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import PostCard from "../../components/post/PostCard";
 import ReplyCard from "../../components/post/ReplyCard";
 
@@ -7,52 +7,83 @@ export default function PostDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  // Mock main post (later comes from backend)
-  const post = {
-    id,
-    author: "alice",
-    content: "I think social platforms should focus more on safety.",
-    time: "2h",
-  };
-
-  // Mock replies (will be extracted to ReplyCard next)
-  const [replies, setReplies] = useState([
-  {
-    id: 1,
-    author: "bob",
-    content: "I agree. Moderation matters more than engagement.",
-    status: "normal",
-  },
-  {
-    id: 2,
-    author: "charlie",
-    content: "You're stupid if you think that.",
-    status: "flagged",
-  },
-  {
-    id: 3,
-    author: "eve",
-    content: "Go kill yourself.",
-    status: "hidden",
-  },
-]);
-
+  const [post, setPost] = useState(null);
+  const [replies, setReplies] = useState([]);
   const [replyText, setReplyText] = useState("");
+  const [loading, setLoading] = useState(true);
 
-  const handleReply = () => {
+  // fetch post + replies
+  useEffect(() => {
+    const fetchPostDetail = async () => {
+      try {
+        const postRes = await fetch(`http://localhost:5000/api/posts/${id}`);
+        if (!postRes.ok) throw new Error("Post not found");
+
+        const postData = await postRes.json();
+
+        const repliesRes = await fetch(
+          `http://localhost:5000/api/replies/${id}`
+        );
+        const repliesData = await repliesRes.json();
+
+        setPost(postData);
+        setReplies(repliesData);
+      } catch (err) {
+        console.error(err);
+        setPost(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPostDetail();
+  }, [id]);
+
+  // create reply
+  const handleReply = async () => {
     if (!replyText.trim()) return;
 
-    setReplies((prev) => [
-      ...prev,
-      {
-        id: Date.now(),
-        author: "you",
-        content: replyText,
-      },
-    ]);
+    try {
+      const userId = "69838a16ad1f80abbe38ee8d"; // TEMP (auth later)
 
-    setReplyText("");
+      const res = await fetch("http://localhost:5000/api/replies", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          postId: id,
+          userId,
+          content: replyText,
+        }),
+      });
+
+      if (!res.ok) throw new Error("Reply failed");
+
+      const newReply = await res.json();
+      setReplies((prev) => [...prev, newReply]);
+      setReplyText("");
+    } catch (err) {
+      console.error(err);
+    }
   };
+
+  // delete reply (optional but ready)
+  const handleDeleteReply = async (replyId) => {
+    await fetch(`http://localhost:5000/api/replies/${replyId}`, {
+      method: "DELETE",
+    });
+
+    setReplies((prev) => prev.filter((r) => r._id !== replyId));
+  };
+
+  // loading state
+  if (loading) {
+    return <p className="text-sm text-gray-500">Loading post…</p>;
+  }
+
+  // not found state
+  if (!post) {
+    return <p className="text-sm text-red-500">Post not found</p>;
+  }
 
   return (
     <div className="space-y-6">
@@ -64,14 +95,10 @@ export default function PostDetail() {
           ← Back
         </button>
 
-        <Link
-          to="/"
-          className="text-accent hover:underline"
-        >
+        <Link to="/" className="text-accent hover:underline">
           Home
         </Link>
       </div>
-
 
       <PostCard post={post} />
 
@@ -93,23 +120,18 @@ export default function PostDetail() {
         </div>
       </div>
 
-      <div className="space-y-4">
-        {/* {replies.map((reply) => (
-          <div
-            key={reply.id}
-            className="bg-white rounded-xl border border-primary/20 p-4 ml-6"
-          >
-            <p className="font-header text-primary text-sm">
-              @{reply.author}
-            </p>
-            <p className="text-sm mt-1 text-black">
-              {reply.content}
-            </p>
-          </div>
-        ))} */}
-        {replies.map((reply) => (
-  <ReplyCard key={reply.id} reply={reply} />
-))}
+      <div className="space-y-4 ml-6">
+        {replies.length === 0 ? (
+          <p className="text-sm text-gray-500">No replies yet</p>
+        ) : (
+          replies.map((reply) => (
+            <ReplyCard
+              key={reply._id}
+              reply={reply}
+              onDelete={handleDeleteReply}
+            />
+          ))
+        )}
       </div>
     </div>
   );

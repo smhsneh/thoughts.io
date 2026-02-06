@@ -1,26 +1,27 @@
 import express from "express";
+import cors from "cors";
 import dotenv from "dotenv";
 import connectDB from "./config/db.js";
-import postRoutes from "./src/routes/postRoutes.js";
-import userRoutes from "./src/routes/userRoutes.js";
-import cors from "cors";
 
+import postRoutes from "./src/routes/postRoutes.js";
+import replyRoutes from "./src/routes/replyRoutes.js";
+import userRoutes from "./src/routes/userRoutes.js";
 
 dotenv.config();
-const app = express();
 
+const app = express(); 
+
+connectDB();
 
 app.use(cors());
 app.use(express.json());
 
-app.use(express.json());
-
 app.use("/api/posts", postRoutes);
+app.use("/api/replies", replyRoutes);
 app.use("/api/users", userRoutes);
 
-connectDB();
-
 const PORT = process.env.PORT || 5000;
+
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
