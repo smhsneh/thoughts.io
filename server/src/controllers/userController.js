@@ -1,36 +1,31 @@
 import User from "../models/User.js";
-// create user
+
 export const createUser = async (req, res) => {
   try {
-    const { username, email, password, role } = req.body;
+    const { username } = req.body;
 
-    if (!username || !email || !password) {
-      return res.status(400).json({
-        message: "username, email, and password are required",
-      });
+    const existing = await User.findOne({ username });
+    if (existing) {
+      return res.status(400).json({ message: "User already exists" });
     }
 
-    const existingUser = await User.findOne({
-      $or: [{ email }, { username }],
-    });
-
-    if (existingUser) {
-      return res.status(409).json({
-        message: "User already exists",
-      });
-    }
-
-    const user = await User.create({
-      username,
-      email,
-      password,
-      role: role || "user",
-    });
-
+    const user = await User.create({ username });
     res.status(201).json(user);
-  } catch (error) {
-    res.status(500).json({
-      message: error.message,
-    });
+  } catch (err) {
+    res.status(500).json({ message: "User creation failed" });
+  }
+};
+
+export const getUserByUsername = async (req, res) => {
+  try {
+    const user = await User.findOne({ username: req.params.username });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ message: "Fetch user failed" });
   }
 };

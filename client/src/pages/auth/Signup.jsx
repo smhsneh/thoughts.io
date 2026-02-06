@@ -1,60 +1,61 @@
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
 
 export default function Signup() {
+  const [username, setUsername] = useState("");
+  const navigate = useNavigate();
+
+  const handleSignup = async () => {
+    if (!username.trim()) return;
+
+    try {
+      const res = await fetch("http://localhost:5000/api/users", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username }),
+      });
+
+      if (!res.ok) {
+        alert("User already exists");
+        return;
+      }
+
+      const user = await res.json();
+
+      localStorage.setItem("user", JSON.stringify(user));
+
+      navigate("/");
+      window.location.reload();
+    } catch (err) {
+      console.error(err);
+      alert("Signup failed");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-l from-white via-soft/100 flex items-center justify-center px-4">
-      <div className="bg-white rounded-2xl border border-soft/30 shadow-sm p-8 w-full max-w-md space-y-6">
-        {/* Title */}
-        <div className="text-center space-y-1">
-          <h2 className="font-header text-3xl font-bold text-primary">
-            SIGN UP
-          </h2>
-          <p className="text-sm text-gray-500">
-            create your thoughts.io account
-          </p>
-        </div>
+      <div className="bg-white rounded-2xl border p-8 w-full max-w-md space-y-6">
+        <h2 className="font-header text-3xl font-bold text-primary text-center">
+          SIGN UP
+        </h2>
 
-        {/* Form */}
-        <div className="space-y-4">
-          <input
-            type="text"
-            placeholder="USERNAME"
-            className="w-full border border-primary/20 rounded-xl px-4 py-3 text-sm outline-none"
-          />
+        <input
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          placeholder="USERNAME"
+          className="w-full border rounded-xl px-4 py-3"
+        />
 
-          <input
-            type="email"
-            placeholder="EMAIL"
-            className="w-full border border-primary/20 rounded-xl px-4 py-3 text-sm outline-none"
-          />
+        <button
+          onClick={handleSignup}
+          className="w-full bg-accent text-white rounded-full py-3 font-semibold"
+        >
+          CREATE ACCOUNT
+        </button>
 
-          <input
-            type="password"
-            placeholder="PASSWORD"
-            className="w-full border border-primary/20 rounded-xl px-4 py-3 text-sm outline-none"
-          />
-
-          <button
-            className="
-              w-full
-              bg-accent
-              text-white
-              rounded-full
-              py-3
-              text-sm
-              font-semibold
-              hover:opacity-90
-              transition
-            "
-          >
-            CREATE ACCOUNT
-          </button>
-        </div>
-
-        {/* Footer */}
         <p className="text-xs text-center text-gray-500">
-          ALREADY HAVE AN ACCOUNT?{" "}
-          <Link to="/login" className="text-accent font-semibold hover:underline">
+          HAVE AN ACCOUNT?{" "}
+          <Link to="/login" className="text-accent font-semibold">
             LOGIN
           </Link>
         </p>

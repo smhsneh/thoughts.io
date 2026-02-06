@@ -1,9 +1,16 @@
+import { NavLink, useNavigate } from "react-router-dom";
 import userAvatar from "../../assets/user.jpg";
-import { NavLink } from "react-router-dom";
 
 export default function Sidebar() {
-  // TEMP: simulate logged-out state
-  const isLoggedIn = false;
+  const navigate = useNavigate();
+
+  // 🔐 Read logged-in user
+  const user = JSON.parse(localStorage.getItem("user"));
+
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    navigate("/login");
+  };
 
   return (
     <aside
@@ -17,7 +24,7 @@ export default function Sidebar() {
         justify-between
       "
     >
-      {/* Top */}
+      {/* TOP */}
       <div className="space-y-6">
         {/* Logo */}
         <div>
@@ -29,17 +36,27 @@ export default function Sidebar() {
           </p>
         </div>
 
-        {/* User / Auth section */}
-        {isLoggedIn ? (
+        {/* AUTH SECTION */}
+        {user ? (
           <div className="flex items-center gap-3 pt-4 border-t border-white/40">
-            <img
-              src={userAvatar}
-              alt="User avatar"
-              className="w-10 h-10 rounded-full object-cover border border-primary/20"
-            />
+            <div className="w-10 h-10 rounded-full bg-soft flex items-center justify-center font-semibold text-primary">
+              {user.username.charAt(0).toUpperCase()}
+            </div>
+
             <div>
-              <p className="text-sm font-semibold">USERNAME</p>
-              <p className="text-xs text-gray-500">@uuu</p>
+              <p className="text-sm font-semibold">
+                {user.name || "USER"}
+              </p>
+              <p className="text-xs text-gray-500">
+                @{user.username}
+              </p>
+
+              <button
+                onClick={handleLogout}
+                className="text-xs text-warning hover:underline mt-1"
+              >
+                LOGOUT
+              </button>
             </div>
           </div>
         ) : (
@@ -50,6 +67,7 @@ export default function Sidebar() {
             >
               LOGIN
             </NavLink>
+
             <NavLink
               to="/signup"
               className="block text-sm font-semibold text-primary hover:underline"
@@ -59,22 +77,28 @@ export default function Sidebar() {
           </div>
         )}
 
-        {/* Navigation */}
+        {/* NAVIGATION */}
         <nav className="flex flex-col gap-3 text-sm pt-4">
           <NavLink to="/" className="font-semibold">
-            Home
+            HOME
           </NavLink>
-          <NavLink to="/profile" className="text-gray-500">
-            Profile
-          </NavLink>
+
+          {user && (
+            <NavLink to="/profile" className="text-gray-500">
+              PROFILE
+            </NavLink>
+          )}
+
           <NavLink to="/admin" className="text-gray-500">
-            Admin Dashboard
+            ADMIN
           </NavLink>
         </nav>
       </div>
 
-      {/* Footer */}
-      <div className="text-xs text-gray-400">thoughts.io</div>
+      {/* FOOTER */}
+      <div className="text-xs text-gray-400">
+        thoughts.io
+      </div>
     </aside>
   );
 }
