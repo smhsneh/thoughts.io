@@ -5,7 +5,6 @@ export default function CreatePost({ onCreate }) {
 
   const handleSubmit = () => {
     if (!text.trim()) return;
-
     onCreate(text);
     setText("");
   };

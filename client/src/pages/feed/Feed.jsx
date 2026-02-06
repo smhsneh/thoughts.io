@@ -1,66 +1,72 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import CreatePost from "../../components/post/CreatePost";
 import PostCard from "../../components/post/PostCard";
 
 export default function Feed() {
-  const [posts, setPosts] = useState([
-  {
-    id: 1,
-    author: "alice",
-    content: "I think social platforms should focus more on safety.",
-    time: "2h",
-    replyCount: 2,
-  },
-  {
-    id: 2,
-    author: "bob",
-    content: "This project is about ethical moderation, not engagement.",
-    time: "4h",
-    replyCount: 0,
-  },
-  {
-    id: 3,
-    author: "charlie",
-    content: "Text-only platforms feel calmer to read.",
-    time: "1d",
-    replyCount: 1,
-  },
-]);
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const handleCreatePost = (content) => {
-    const newPost = {
-      id: Date.now(),
-      author: "you",
-      content,
-      time: "now",
-    };
-
-    setPosts((prev) => [newPost, ...prev]);
+  // Fetch posts from backend
+  const fetchPosts = async () => {
+    try {
+      const res = await fetch("http://localhost:5000/api/posts");
+      const data = await res.json();
+      setPosts(data);
+    } catch (err) {
+      console.error("Failed to fetch posts", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleDeletePost = (id) => {
-    setPosts((prev) => prev.filter((post) => post.id !== id));
+  useEffect(() => {
+    fetchPosts();
+  }, []);
+
+  // Create post via backend
+  const handleCreatePost = async (content) => {
+    try {
+      // TEMP: hardcoded userId (we’ll replace with auth later)
+      const userId = "69838a16ad1f80abbe38ee8d";
+
+      const res = await fetch("http://localhost:5000/api/posts", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ content, userId }),
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to create post");
+      }
+
+      const newPost = await res.json();
+      setPosts((prev) => [newPost, ...prev]);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (
     <div className="space-y-6">
       <h2 className="font-header text-3xl font-bold text-primary">
-        Home
+        home
       </h2>
 
       <CreatePost onCreate={handleCreatePost} />
 
       <h3 className="text-sm font-semibold text-gray-600">
-        Latest thoughts
+        latest thoughts
       </h3>
 
-      {posts.map((post) => (
-        <PostCard
-          key={post.id}
-          post={post}
-          onDelete={handleDeletePost}
-        />
-      ))}
+      {loading ? (
+        <p className="text-sm text-gray-500">Loading...</p>
+      ) : (
+        posts.map((post) => (
+          <PostCard key={post._id} post={post} />
+        ))
+      )}
     </div>
   );
 }
