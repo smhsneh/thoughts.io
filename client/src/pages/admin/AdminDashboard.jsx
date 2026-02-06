@@ -1,113 +1,63 @@
+import { useEffect, useState } from "react";
+
 export default function AdminDashboard() {
-  const flaggedReplies = [
-    {
-      id: 1,
-      user: "eve",
-      content: "Go kill yourself.",
-      category: "Threat / Hate Speech",
-      score: 0.92,
-      status: "hidden",
-    },
-    {
-      id: 2,
-      user: "charlie",
-      content: "You're stupid if you think that.",
-      category: "Harassment",
-      score: 0.71,
-      status: "flagged",
-    },
-  ];
+  const [replies, setReplies] = useState([]);
+
+  useEffect(() => {
+    fetch("http://localhost:5000/api/replies/flagged/all")
+      .then((res) => res.json())
+      .then(setReplies);
+  }, []);
+
+  const updateStatus = async (id, status) => {
+    await fetch(`http://localhost:5000/api/replies/${id}/status`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status }),
+    });
+
+    setReplies((prev) =>
+      prev.filter((r) => r._id !== id)
+    );
+  };
 
   return (
     <div className="space-y-6">
       <h2 className="font-header text-3xl font-bold text-primary">
-        Admin Dashboard
+        Moderation Dashboard
       </h2>
 
-      <div className="bg-white rounded-2xl border border-soft/40 p-5 shadow-sm">
-        <h3 className="font-header text-lg font-semibold mb-2">
-          Alerts & Notifications
-        </h3>
+      {replies.map((reply) => (
+        <div
+          key={reply._id}
+          className="bg-white p-4 rounded-xl border"
+        >
+          <p className="text-sm">
+            <strong>@{reply.author.username}</strong>:{" "}
+            {reply.content}
+          </p>
 
-        <div className="text-sm space-y-1">
-          <p>🚩 Harmful reply detected</p>
-          <p>🚩 Repeat offender identified</p>
-          <p>⛔ User blocked by admin</p>
-        </div>
-      </div>
+          <p className="text-xs text-gray-500 mt-1">
+            Post: {reply.post.content.slice(0, 40)}…
+          </p>
 
-      <div className="bg-white rounded-2xl border border-soft/40 p-5 shadow-sm">
-        <h3 className="font-header text-lg font-semibold mb-2">
-          Model Stats
-        </h3>
-
-        <p className="text-sm">
-          <strong>Latest Category:</strong> Hate Speech
-        </p>
-        <p className="text-sm">
-          <strong>Confidence Score:</strong> 0.92
-        </p>
-        <p className="text-sm">
-          <strong>Model Status:</strong>{" "}
-          <span className="text-green-600">Active</span>
-        </p>
-      </div>
-
-      <div className="bg-white rounded-2xl border border-soft/40 p-5 shadow-sm">
-        <h3 className="font-header text-lg font-semibold mb-2">
-          Moderation Summary
-        </h3>
-
-        <div className="text-sm space-y-1">
-          <p>👁 Comments hidden: 2</p>
-          <p>✅ Comments approved: 3</p>
-          <p>⛔ Users blocked: 1</p>
-        </div>
-      </div>
-
-      <div className="bg-white rounded-2xl border border-soft/40 p-5 shadow-sm">
-        <h3 className="font-header text-lg font-semibold mb-4">
-          Flagged Replies
-        </h3>
-
-        <div className="space-y-4">
-          {flaggedReplies.map((reply) => (
-            <div
-              key={reply.id}
-              className="border border-primary/20 rounded-xl p-4"
+          <div className="flex gap-3 mt-3">
+            <button
+              onClick={() => updateStatus(reply._id, "hidden")}
+              className="text-xs text-red-500"
             >
-              <div className="flex justify-between text-sm mb-1">
-                <span className="font-semibold">@{reply.user}</span>
-                <span className="text-gray-500">
-                  Score: {reply.score}
-                </span>
-              </div>
+              Hide
+            </button>
 
-              <p className="text-sm mb-2">
-                {reply.content}
-              </p>
-
-              <div className="text-xs text-red-600 mb-3">
-                Category: {reply.category}
-              </div>
-
-              <div className="flex gap-4 text-xs">
-                <button className="text-accent hover:underline">
-                  Hide comment
-                </button>
-
-                <button className="text-accent hover:underline">
-                  Do not hide
-                </button>
-
-                <button className="text-warning hover:underline">
-                  Block user
-                </button>
-              </div>
-            </div>
-          ))}
+            <button
+              onClick={() => updateStatus(reply._id, "normal")}
+              className="text-xs text-green-600"
+            >
+              Restore
+            </button>
+          </div>
         </div>
-      </div>
+      ))}
     </div>
   );
 }

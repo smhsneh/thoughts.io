@@ -11,10 +11,6 @@ export const createReply = async (req, res) => {
       content,
     });
 
-    await Post.findByIdAndUpdate(postId, {
-      $inc: { repliesCount: 1 },
-    });
-
     const populatedReply = await reply.populate("author", "username");
 
     res.status(201).json(populatedReply);
@@ -26,9 +22,7 @@ export const createReply = async (req, res) => {
 
 export const getRepliesByPost = async (req, res) => {
   try {
-    const { postId } = req.params;
-
-    const replies = await Reply.find({ post: postId })
+    const replies = await Reply.find({ post: req.params.postId })
       .populate("author", "username")
       .sort({ createdAt: 1 });
 
@@ -41,15 +35,30 @@ export const getRepliesByPost = async (req, res) => {
 
 export const deleteReply = async (req, res) => {
   try {
-    const reply = await Reply.findById(req.params.id);
-
-    if (!reply) {
-      return res.status(404).json({ message: "Reply not found" });
-    }
-
-    await reply.deleteOne();
+    await Reply.findByIdAndDelete(req.params.id);
     res.json({ message: "Reply deleted" });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error(err);
+    res.status(500).json({ message: "Delete failed" });
   }
+};
+
+export const getFlaggedReplies = async (req, res) => {
+  const replies = await Reply.find({ status: "flagged" })
+    .populate("author", "username")
+    .populate("post", "content");
+
+  res.json(replies);
+};
+
+export const updateReplyStatus = async (req, res) => {
+  const { status } = req.body;
+
+  const reply = await Reply.findByIdAndUpdate(
+    req.params.id,
+    { status },
+    { new: true }
+  );
+
+  res.json(reply);
 };

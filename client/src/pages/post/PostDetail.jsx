@@ -22,7 +22,7 @@ export default function PostDetail() {
         const postData = await postRes.json();
 
         const repliesRes = await fetch(
-          `http://localhost:5000/api/replies/${id}`
+          `http://localhost:5000/api/replies/${id}`,
         );
         const repliesData = await repliesRes.json();
 
@@ -44,7 +44,9 @@ export default function PostDetail() {
     if (!replyText.trim()) return;
 
     try {
-      const userId = "69838a16ad1f80abbe38ee8d"; // TEMP (auth later)
+      const user = JSON.parse(localStorage.getItem("user"));
+      if (!user) return alert("Please login first");
+      const userId = user._id;
 
       const res = await fetch("http://localhost:5000/api/replies", {
         method: "POST",

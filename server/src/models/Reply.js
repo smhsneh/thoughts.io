@@ -16,10 +16,13 @@ const replySchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    isFlagged: {
-      type: Boolean,
-      default: false,
+    status: {
+      type: String,
+      enum: ["normal", "flagged", "hidden"],
+      default: "normal",
     },
+    confidence: Number,
+    category: String,
   },
   { timestamps: true }
 );

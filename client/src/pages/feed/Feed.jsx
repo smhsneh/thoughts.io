@@ -6,7 +6,7 @@ export default function Feed() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Fetch posts from backend
+  // Fetch posts
   const fetchPosts = async () => {
     try {
       const res = await fetch("http://localhost:5000/api/posts");
@@ -23,25 +23,37 @@ export default function Feed() {
     fetchPosts();
   }, []);
 
+  // Create post
   const handleCreatePost = async (content) => {
     try {
-      const userId = "69838a16ad1f80abbe38ee8d";
+      const user = JSON.parse(localStorage.getItem("user"));
+      if (!user) return alert("Please login first");
+      const userId = user._id;
 
       const res = await fetch("http://localhost:5000/api/posts", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ content, userId }),
       });
 
-      if (!res.ok) {
-        throw new Error("Failed to create post");
-      }
+      if (!res.ok) throw new Error("Failed to create post");
 
-      await fetchPosts();
+      await fetchPosts(); // refresh feed
     } catch (err) {
       console.error(err);
+    }
+  };
+
+  // Delete post
+  const handleDeletePost = async (postId) => {
+    try {
+      await fetch(`http://localhost:5000/api/posts/${postId}`, {
+        method: "DELETE",
+      });
+
+      setPosts((prev) => prev.filter((p) => p._id !== postId));
+    } catch (err) {
+      console.error("Delete failed", err);
     }
   };
 
@@ -56,7 +68,13 @@ export default function Feed() {
       {loading ? (
         <p className="text-sm text-gray-500">Loading...</p>
       ) : (
-        posts.map((post) => <PostCard key={post._id} post={post} />)
+        posts.map((post) => (
+          <PostCard
+            key={post._id}
+            post={post}
+            onDelete={handleDeletePost} // ✅ THIS WAS MISSING
+          />
+        ))
       )}
     </div>
   );

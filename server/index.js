@@ -6,6 +6,8 @@ import connectDB from "./config/db.js";
 import postRoutes from "./src/routes/postRoutes.js";
 import replyRoutes from "./src/routes/replyRoutes.js";
 import userRoutes from "./src/routes/userRoutes.js";
+import authRoutes from "./src/routes/authRoutes.js";
+
 
 dotenv.config();
 
@@ -15,7 +17,7 @@ connectDB();
 
 app.use(cors());
 app.use(express.json());
-
+app.use("/api/auth", authRoutes);
 app.use("/api/posts", postRoutes);
 app.use("/api/replies", replyRoutes);
 app.use("/api/users", userRoutes);
