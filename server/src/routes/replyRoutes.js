@@ -9,6 +9,6 @@ const router = express.Router();
 
 router.post("/", createReply);
 router.get("/:postId", getRepliesByPost);
-router.delete("/:id", deleteReply); 
+router.delete("/:id", deleteReply);
 
 export default router;

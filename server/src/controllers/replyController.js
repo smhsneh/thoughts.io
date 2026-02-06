@@ -41,14 +41,15 @@ export const getRepliesByPost = async (req, res) => {
 
 export const deleteReply = async (req, res) => {
   try {
-    const reply = await Reply.findByIdAndDelete(req.params.id);
+    const reply = await Reply.findById(req.params.id);
 
     if (!reply) {
       return res.status(404).json({ message: "Reply not found" });
     }
 
+    await reply.deleteOne();
     res.json({ message: "Reply deleted" });
   } catch (err) {
-    res.status(500).json({ message: "Delete failed" });
+    res.status(500).json({ message: err.message });
   }
 };
