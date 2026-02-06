@@ -23,10 +23,8 @@ export default function Feed() {
     fetchPosts();
   }, []);
 
-  // Create post via backend
   const handleCreatePost = async (content) => {
     try {
-      // TEMP: hardcoded userId (we’ll replace with auth later)
       const userId = "69838a16ad1f80abbe38ee8d";
 
       const res = await fetch("http://localhost:5000/api/posts", {
@@ -41,8 +39,7 @@ export default function Feed() {
         throw new Error("Failed to create post");
       }
 
-      const newPost = await res.json();
-      setPosts((prev) => [newPost, ...prev]);
+      await fetchPosts();
     } catch (err) {
       console.error(err);
     }
@@ -50,22 +47,16 @@ export default function Feed() {
 
   return (
     <div className="space-y-6">
-      <h2 className="font-header text-3xl font-bold text-primary">
-        home
-      </h2>
+      <h2 className="font-header text-3xl font-bold text-primary">home</h2>
 
       <CreatePost onCreate={handleCreatePost} />
 
-      <h3 className="text-sm font-semibold text-gray-600">
-        latest thoughts
-      </h3>
+      <h3 className="text-sm font-semibold text-gray-600">latest thoughts</h3>
 
       {loading ? (
         <p className="text-sm text-gray-500">Loading...</p>
       ) : (
-        posts.map((post) => (
-          <PostCard key={post._id} post={post} />
-        ))
+        posts.map((post) => <PostCard key={post._id} post={post} />)
       )}
     </div>
   );
