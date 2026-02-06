@@ -6,11 +6,11 @@ export default function Login() {
   const navigate = useNavigate();
 
   const handleLogin = async () => {
-    if (!username.trim()) return;
-
     try {
+      const normalized = username.trim().toLowerCase();
+
       const res = await fetch(
-        `http://localhost:5000/api/users/${username}`
+        `http://localhost:5000/api/users/${normalized}`
       );
 
       if (!res.ok) {
