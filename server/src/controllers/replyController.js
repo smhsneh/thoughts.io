@@ -43,14 +43,6 @@ export const deleteReply = async (req, res) => {
   }
 };
 
-export const getFlaggedReplies = async (req, res) => {
-  const replies = await Reply.find({ status: "flagged" })
-    .populate("author", "username")
-    .populate("post", "content");
-
-  res.json(replies);
-};
-
 export const updateReplyStatus = async (req, res) => {
   const { status } = req.body;
 
@@ -61,4 +53,17 @@ export const updateReplyStatus = async (req, res) => {
   );
 
   res.json(reply);
+};
+
+export const getFlaggedReplies = async (req, res) => {
+  try {
+    const replies = await Reply.find({ isFlagged: true })
+      .populate("author", "username")
+      .sort({ createdAt: -1 });
+
+    res.json(replies);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Failed to fetch flagged replies" });
+  }
 };

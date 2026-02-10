@@ -17,4 +17,7 @@ router.delete("/:id", deleteReply);
 router.get("/flagged/all", getFlaggedReplies);
 router.patch("/:id/status", updateReplyStatus);
 
+import { getFlaggedReplies } from "../controllers/replyController.js";
+router.get("/flagged", getFlaggedReplies);
+
 export default router;
