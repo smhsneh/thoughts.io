@@ -5,22 +5,24 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchFlaggedReplies = async () => {
-      try {
-        const res = await fetch(
-          "http://localhost:5000/api/replies/flagged"
-        );
-        const data = await res.json();
-        setFlaggedReplies(data);
-      } catch (error) {
-        console.error("Failed to fetch flagged replies", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchFlaggedReplies = async () => {
+    try {
+      const res = await fetch("http://localhost:5000/api/replies/flagged");
+      const data = await res.json();
 
-    fetchFlaggedReplies();
-  }, []);
+      if (Array.isArray(data)) {
+        setFlaggedReplies(data);
+      } else {
+        setFlaggedReplies([]);
+      }
+    } catch (error) {
+      console.error("Failed to fetch flagged replies", error);
+      setFlaggedReplies([]);
+    }
+  };
+
+  fetchFlaggedReplies();
+}, []);
 
   return (
     <div className="space-y-8">

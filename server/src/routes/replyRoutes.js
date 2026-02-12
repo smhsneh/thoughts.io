@@ -3,17 +3,20 @@ import {
   createReply,
   getRepliesByPost,
   deleteReply,
-  getFlaggedReplies,
   updateReplyStatus,
+  getFlaggedReplies
 } from "../controllers/replyController.js";
 
 const router = express.Router();
 
-router.post("/", createReply);
-router.get("/flagged/all", getFlaggedReplies);
-router.get("/:postId", getRepliesByPost);
-router.delete("/:id", deleteReply);
-router.patch("/:id/status", updateReplyStatus);
+/* IMPORTANT: Static routes FIRST */
+router.get("/flagged", getFlaggedReplies);
 
+/* Then dynamic routes */
+router.get("/:postId", getRepliesByPost);
+
+router.post("/", createReply);
+router.delete("/:id", deleteReply);
+router.patch("/:id", updateReplyStatus);
 
 export default router;
