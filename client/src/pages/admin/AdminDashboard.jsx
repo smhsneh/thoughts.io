@@ -5,24 +5,26 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-  const fetchFlaggedReplies = async () => {
-    try {
-      const res = await fetch("http://localhost:5000/api/replies/flagged");
-      const data = await res.json();
+    const fetchFlaggedReplies = async () => {
+      try {
+        const res = await fetch("http://localhost:5000/api/replies/flagged");
+        const data = await res.json();
 
-      if (Array.isArray(data)) {
-        setFlaggedReplies(data);
-      } else {
+        if (Array.isArray(data)) {
+          setFlaggedReplies(data);
+        } else {
+          setFlaggedReplies([]);
+        }
+      } catch (error) {
+        console.error("Failed to fetch flagged replies", error);
         setFlaggedReplies([]);
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      console.error("Failed to fetch flagged replies", error);
-      setFlaggedReplies([]);
-    }
-  };
+    };
 
-  fetchFlaggedReplies();
-}, []);
+    fetchFlaggedReplies();
+  }, []);
 
   return (
     <div className="space-y-8">
@@ -32,9 +34,7 @@ export default function AdminDashboard() {
 
       <div className="space-y-4">
         <div className="bg-white rounded-2xl border border-soft/40 p-5 shadow-sm">
-          <h3 className="font-semibold text-primary">
-            flagged activity
-          </h3>
+          <h3 className="font-semibold text-primary">flagged activity</h3>
           <p className="text-sm text-gray-600 mt-1">
             total flagged replies detected by system
           </p>
@@ -52,9 +52,7 @@ export default function AdminDashboard() {
         {loading ? (
           <p className="text-sm text-gray-500">loading...</p>
         ) : flaggedReplies.length === 0 ? (
-          <p className="text-sm text-gray-500">
-            no flagged replies yet
-          </p>
+          <p className="text-sm text-gray-500">no flagged replies yet</p>
         ) : (
           <div className="space-y-4">
             {flaggedReplies.map((reply) => (
@@ -71,17 +69,13 @@ export default function AdminDashboard() {
                   </span>
                 </div>
 
-                <p className="text-sm text-black mt-2">
-                  {reply.content}
-                </p>
+                <p className="text-sm text-black mt-2">{reply.content}</p>
 
                 <div className="flex gap-4 text-xs text-gray-500 mt-3">
                   <span>category: {reply.label || "N/A"}</span>
                   <span>
                     confidence:{" "}
-                    {reply.confidence
-                      ? reply.confidence.toFixed(2)
-                      : 0}
+                    {reply.confidence ? reply.confidence.toFixed(2) : 0}
                   </span>
                   <span>severity: {reply.severity || "N/A"}</span>
                 </div>
