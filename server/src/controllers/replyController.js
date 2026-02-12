@@ -44,15 +44,20 @@ export const deleteReply = async (req, res) => {
 };
 
 export const updateReplyStatus = async (req, res) => {
-  const { status } = req.body;
+  try {
+    const { status } = req.body;
 
-  const reply = await Reply.findByIdAndUpdate(
-    req.params.id,
-    { status },
-    { new: true }
-  );
+    const reply = await Reply.findByIdAndUpdate(
+      req.params.id,
+      { status },
+      { new: true }
+    );
 
-  res.json(reply);
+    res.json(reply);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Update failed" });
+  }
 };
 
 export const getFlaggedReplies = async (req, res) => {
