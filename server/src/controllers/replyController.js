@@ -45,11 +45,11 @@ export const deleteReply = async (req, res) => {
 
 export const updateReplyStatus = async (req, res) => {
   try {
-    const { status } = req.body;
+    const { status, isFlagged } = req.body;
 
     const reply = await Reply.findByIdAndUpdate(
       req.params.id,
-      { status },
+      { status, isFlagged },
       { new: true }
     );
 
