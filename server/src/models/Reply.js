@@ -19,7 +19,6 @@ const replySchema = new mongoose.Schema(
       required: true,
     },
 
-    //  ML READY FIELDS
     label: {
       type: String,
       default: null,
@@ -30,11 +29,6 @@ const replySchema = new mongoose.Schema(
       default: 0,
     },
 
-    severity: {
-      type: String,
-      default: null,
-    },
-
     isFlagged: {
       type: Boolean,
       default: false,
@@ -42,8 +36,8 @@ const replySchema = new mongoose.Schema(
 
     status: {
       type: String,
-      enum: ["normal", "hidden"],
-      default: "normal",
+      enum: ["visible", "flagged"],
+      default: "visible",
     },
   },
   { timestamps: true }

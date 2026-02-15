@@ -3,34 +3,100 @@ import { useEffect, useState } from "react";
 export default function AdminDashboard() {
   const [flaggedReplies, setFlaggedReplies] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [message, setMessage] = useState("");
+
+  const fetchFlaggedReplies = async () => {
+    try {
+      const res = await fetch("http://localhost:5000/api/replies/flagged");
+      const data = await res.json();
+
+      if (Array.isArray(data)) {
+        setFlaggedReplies(data);
+      } else {
+        setFlaggedReplies([]);
+      }
+    } catch (error) {
+      console.error("Failed to fetch flagged replies", error);
+      setFlaggedReplies([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchFlaggedReplies = async () => {
-      try {
-        const res = await fetch("http://localhost:5000/api/replies/flagged");
-        const data = await res.json();
-
-        if (Array.isArray(data)) {
-          setFlaggedReplies(data);
-        } else {
-          setFlaggedReplies([]);
-        }
-      } catch (error) {
-        console.error("Failed to fetch flagged replies", error);
-        setFlaggedReplies([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchFlaggedReplies();
   }, []);
+
+  // 🔥 BLOCK USER
+  const blockUser = async (userId) => {
+    try {
+      await fetch(
+        `http://localhost:5000/api/admin/user/${userId}/block`,
+        { method: "PATCH" }
+      );
+
+      // Remove all replies from this user
+      setFlaggedReplies((prev) =>
+        prev.filter((reply) => reply.author?._id !== userId)
+      );
+
+      setMessage("User has been blocked successfully.");
+    } catch (error) {
+      console.error("Block failed", error);
+      setMessage("Failed to block user.");
+    }
+  };
+
+  // 🔥 HIDE REPLY
+  const hideReply = async (replyId) => {
+    try {
+      await fetch(
+        `http://localhost:5000/api/admin/reply/${replyId}/hide`,
+        { method: "PATCH" }
+      );
+
+      setFlaggedReplies((prev) =>
+        prev.filter((reply) => reply._id !== replyId)
+      );
+
+      setMessage("Reply hidden successfully.");
+    } catch (error) {
+      console.error("Hide failed", error);
+      setMessage("Failed to hide reply.");
+    }
+  };
+
+  // 🔥 ALLOW REPLY
+  const allowReply = async (replyId) => {
+    try {
+      await fetch(
+        `http://localhost:5000/api/admin/reply/${replyId}/allow`,
+        { method: "PATCH" }
+      );
+
+      setFlaggedReplies((prev) =>
+        prev.filter((reply) => reply._id !== replyId)
+      );
+
+      setMessage("Reply allowed successfully.");
+    } catch (error) {
+      console.error("Allow failed", error);
+      setMessage("Failed to allow reply.");
+    }
+  };
 
   return (
     <div className="space-y-8">
       <h2 className="font-header text-3xl font-bold text-primary">
         admin dashboard
       </h2>
+
+      {/* Success Message */}
+      {message && (
+        <div className="text-sm text-green-600 bg-green-50 p-3 rounded-lg">
+          {message}
+        </div>
+      )}
 
       <div className="space-y-4">
         <div className="bg-white rounded-2xl border border-soft/40 p-5 shadow-sm">
@@ -75,21 +141,32 @@ export default function AdminDashboard() {
                   <span>category: {reply.label || "N/A"}</span>
                   <span>
                     confidence:{" "}
-                    {reply.confidence ? reply.confidence.toFixed(2) : 0}
+                    {reply.confidence
+                      ? reply.confidence.toFixed(2)
+                      : 0}
                   </span>
                   <span>severity: {reply.severity || "N/A"}</span>
                 </div>
 
                 <div className="flex gap-3 mt-4">
-                  <button className="text-xs px-3 py-1 rounded-full border border-primary/30 hover:bg-primary/5">
+                  <button
+                    onClick={() => hideReply(reply._id)}
+                    className="text-xs px-3 py-1 rounded-full border border-primary/30 hover:bg-primary/5"
+                  >
                     hide
                   </button>
 
-                  <button className="text-xs px-3 py-1 rounded-full border border-primary/30 hover:bg-primary/5">
+                  <button
+                    onClick={() => allowReply(reply._id)}
+                    className="text-xs px-3 py-1 rounded-full border border-primary/30 hover:bg-primary/5"
+                  >
                     allow
                   </button>
 
-                  <button className="text-xs px-3 py-1 rounded-full border border-warning text-warning hover:bg-warning/5">
+                  <button
+                    onClick={() => blockUser(reply.author?._id)}
+                    className="text-xs px-3 py-1 rounded-full border border-warning text-warning hover:bg-warning/5"
+                  >
                     block user
                   </button>
                 </div>

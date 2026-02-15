@@ -9,6 +9,10 @@ const userSchema = new mongoose.Schema(
       trim: true,
       lowercase: true,
     },
+    isBlocked: {
+  type: Boolean,
+  default: false
+},
   },
   { timestamps: true }
 );
