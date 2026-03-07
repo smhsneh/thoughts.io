@@ -1,7 +1,7 @@
 import Post from "../models/Post.js";
 import User from "../models/User.js";
 import Reply from "../models/Reply.js";
-
+import axios from "axios";
 /**
  * CREATE POST
  * POST /api/posts
@@ -10,14 +10,26 @@ export const createPost = async (req, res) => {
   try {
     const { content, userId } = req.body;
 
+    // Call ML API
+    const mlResponse = await axios.post(
+      "http://127.0.0.1:8000/predict",
+      { text: content }
+    );
+
+    const { label, confidence } = mlResponse.data;
+
+    const isFlagged = label !== "not_cyberbullying";
+
     const post = await Post.create({
       content,
       author: userId,
+      isFlagged,
     });
 
     const populatedPost = await post.populate("author", "username");
 
     res.status(201).json(populatedPost);
+
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Failed to create post" });

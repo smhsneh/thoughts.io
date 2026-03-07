@@ -21,12 +21,18 @@ const replySchema = new mongoose.Schema(
 
     label: {
       type: String,
-      default: null,
+      enum: ["not_cyberbullying", "cyberbullying"],
+      default: "not_cyberbullying",
     },
 
     confidence: {
       type: Number,
       default: 0,
+    },
+
+    targetUser: {
+      type: String,
+      default: null,
     },
 
     isFlagged: {
