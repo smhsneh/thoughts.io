@@ -1,75 +1,122 @@
 # thoughts.io
 
-thoughts.io is a full stack social media simulator built to demonstrate cyberbullying detection and moderation workflows. it simulates a reddit/twitter-like threaded discussion platform where users can create posts, reply to conversations, and have replies analyzed in real time by a machine learning model. the primary focus of the system is responsible content moderation and structured backend architecture rather than engagement-driven design.
+social media simulator · cyberbullying detection · moderation pipelines
 
-the system is divided into three application layers (frontend, backend api, and ml inference server) with mongodb atlas as the cloud database.
+![node](https://img.shields.io/badge/node.js-v18+-000?style=flat-square&labelColor=000&color=333)
+![stack](https://img.shields.io/badge/stack-react_+_express_+_mongodb-000?style=flat-square&labelColor=000&color=333)
+![ml](https://img.shields.io/badge/ml-fastapi_inference-000?style=flat-square&labelColor=000&color=333)
+
+---
+
+a threaded discussion platform focused on backend architecture, real-time moderation pipelines, and admin review workflows. users create posts and replies — every reply passes through a machine learning inference step before it's stored.
+
+the primary focus is **not** engagement-driven social features. it's the moderation pipeline.
 
 ---
 
 ## tech stack
 
-- react (frontend)
-- node.js + express (backend api)
-- fastapi (ml inference server)
-- mongodb atlas (cloud database)
-- mongoose (mongodb orm)
-- axios (backend to ml communication)
-
----
-
-## moderation workflow
-
-1. user submits a reply
-2. backend sends reply text to fastapi ml server
-3. ml server predicts one of 6 classes:
-   - not_cyberbullying
-   - gender
-   - religion
-   - ethnicity
-   - age
-   - other_cyberbullying
-4. backend stores:
-   - label
-   - confidence score
-   - isflagged (true if not_cyberbullying is not predicted)
-5. flagged replies appear in admin dashboard
-6. admin can hide or allow replies
-
-only replies classified as cyberbullying are shown in the admin dashboard.
+| layer | tools |
+|---|---|
+| frontend | react, vite, tailwind css |
+| backend | node.js, express.js, mongoose, axios |
+| database | mongodb atlas |
+| ml inference | fastapi (external) |
 
 ---
 
 ## architecture
-the system requires four services running simultaneously:
 
-| service   | port  |
-|-----------|-------|
-| frontend  | 3000  |
-| backend   | 5000  |
-| ml server | 8000  |
-| database  | mongodb atlas |
+| service | port |
+|---|---|
+| frontend | 5173 |
+| backend api | 5000 |
+| ml inference | 8000 |
+| database | mongodb atlas |
 
+---
+
+## moderation pipeline
+
+```
+user submits reply
+       ↓
+backend → POST http://127.0.0.1:8000/predict
+       ↓
+ml returns { label, confidence }
+       ↓
+backend stores label + confidence + moderation_status
+       ↓
+cyberbullying? → flagged for admin review
+       ↓
+admin allows or hides
+       ↓
+only visible replies shown in threads
+```
+
+---
+
+## classification labels
+
+the ml api is expected to return one of:
+
+```
+not_cyberbullying   gender   religion   ethnicity   age   other_cyberbullying
+```
+
+---
+
+## ml server contract
+
+> this repo does **not** include the ml model or fastapi server.
+> the backend expects it running at `http://127.0.0.1:8000/predict`.
+> without it, reply creation will fail.
+
+**request**
+
+```json
+{ "text": "reply content" }
+```
+
+**response**
+
+```json
+{ "label": "not_cyberbullying", "confidence": 0.98 }
+```
+
+compatible with your own fastapi server, a mock api, or any moderation service matching this contract.
+
+---
 
 ## prerequisites
 
 - node.js v18+
 - npm
-- python 3.9+
-- mongodb atlas cluster (database user created and ip whitelisted)
+- mongodb atlas cluster
 
 ---
 
-## environment variables
+## environment setup
 
 create `server/.env`:
 
-```bash
-mongo_uri=your_mongodb_connection_string
-port=5000
+```env
+MONGO_URI=your_mongodb_connection_string
+PORT=5000
 ```
 
-## setup
-for backend clone the repo , install and start backend
+---
+
+## installation
+
+**1 · clone**
+
+```bash
+git clone <repo-url>
+cd thoughts.io-main
+```
+
+**2 · backend**
 
 ```bash
 cd server
@@ -77,28 +124,48 @@ npm install
 npm run dev
 ```
 
-for ml server ( install dependencies manually)
+runs on `http://localhost:5000`
 
-```bash
-cd (ml model folder)
-python -m venv venv
-pip install -r requirements.txt 
-uvicorn app:app --reload --port 8000
-```
-activate environment
-```bash
-venv\scripts\activate
-```
+**3 · frontend**
 
-install dependencies and run server
-```bash
-pip install -r requirements.txt
-uvicorn ml_server:app --reload --port 8000
-```
-
-install and start frontend
 ```bash
 cd client
 npm install
 npm run dev
 ```
+
+runs on `http://localhost:5173`
+
+---
+
+## project structure
+
+```
+thoughts.io/
+├── client/        # react frontend
+├── server/        # express backend api
+└── README.md
+```
+
+---
+
+## features
+
+- create and view discussion posts
+- threaded reply system
+- real-time moderation pipeline
+- cyberbullying classification support
+- admin moderation dashboard — allow or hide flagged replies
+- mongodb atlas cloud database integration
+
+---
+
+## future improvements
+
+- authentication & jwt authorization
+- real ml model integration
+- role-based moderation
+- nested threaded replies
+- toxicity analytics dashboard
+- websocket live updates
+- docker deployment support
